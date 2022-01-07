@@ -17,6 +17,8 @@ on:
     paths:
       - "Dockerfile"
       - "etc/unbound/unbound.conf"
+  schedule:
+    - cron: "19 7 * * 2"
 
 jobs:
   lint:
@@ -54,36 +56,35 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           logout: true
-      - name: Build and export to Docker
+      - name: Build image
         uses: docker/build-push-action@v2
         with:
           tags: testimage
           platforms: linux/arm/v7
+          cache-to: type=gha,mode=max
           pull: true
-          no-cache: true
           load: true
       - name: Test image
         # https://workbench.sidnlabs.nl/bad-dnssec.html
         run: |
-          docker run --name=test --rm --network=host --security-opt seccomp=unconfined --platform=linux/arm/v7 -d testimage
+          docker run --name=test --rm --network=host --platform=linux/arm/v7 -d testimage
           sleep 10s
           docker logs test
           docker exec test ls /var/lib/unbound/root.hints
           docker exec test ls /var/lib/unbound/root.key
           docker exec test ls /var/lib/unbound/root.zone
           docker exec test /usr/sbin/unbound-checkconf -f /etc/unbound/unbound.conf
-          docker exec test drill -4D -p 8353 ok.ok.ok.bad-dnssec.wb.sidnlabs.nl @127.0.0.1  | tee /dev/stderr | grep -q NOERROR
-          docker exec test drill -4D -p 8353 ok.bogussig.ok.bad-dnssec.wb.sidnlabs.nl @127.0.0.1 | tee /dev/stderr | grep -q SERVFAIL
-          docker exec test drill -4D -p 8353 signotincepted.bad-dnssec.wb.sidnlabs.nl @127.0.0.1 | tee /dev/stderr | grep -q SERVFAIL
-          docker exec test drill -4D -p 8353 ok.ok.sigexpired.bad-dnssec.wb.sidnlabs.nl @127.0.0.1 | tee /dev/stderr | grep -q SERVFAIL
-          docker exec test drill -4D -p 8353 ok.ok.ok.bad-dnssec.wb.sidnlabs.nl @127.0.0.1 | tee /dev/stderr | egrep -q 'flags:[a-z ]*ad{1}.*;'
-          docker exec test drill -4D -p 8353 unknownalgorithm.ok.ok.bad-dnssec.wb.sidnlabs.nl @127.0.0.1 | tee /dev/stderr | egrep -q 'flags:[a-z ]*ad{0}.*;'
+          docker exec test drill -4D -p 8253 ok.ok.ok.bad-dnssec.wb.sidnlabs.nl @127.0.0.1  | tee /dev/stderr | grep -q NOERROR
+          docker exec test drill -4D -p 8253 ok.bogussig.ok.bad-dnssec.wb.sidnlabs.nl @127.0.0.1 | tee /dev/stderr | grep -q SERVFAIL
+          docker exec test drill -4D -p 8253 signotincepted.bad-dnssec.wb.sidnlabs.nl @127.0.0.1 | tee /dev/stderr | grep -q SERVFAIL
+          docker exec test drill -4D -p 8253 ok.ok.sigexpired.bad-dnssec.wb.sidnlabs.nl @127.0.0.1 | tee /dev/stderr | grep -q SERVFAIL
+          docker exec test drill -4D -p 8253 ok.ok.ok.bad-dnssec.wb.sidnlabs.nl @127.0.0.1 | tee /dev/stderr | egrep -q 'flags:[a-z ]*ad{1}.*;'
+          docker exec test drill -4D -p 8253 unknownalgorithm.ok.ok.bad-dnssec.wb.sidnlabs.nl @127.0.0.1 | tee /dev/stderr | egrep -q 'flags:[a-z ]*ad{0}.*;'
           docker stop test
-      - name: Build and push
+      - name: Push image
         uses: docker/build-push-action@v2
         with:
           tags: ${{ steps.imagename.outputs.tags }}
           platforms: linux/arm/v7
-          pull: true
-          no-cache: true
+          cache-from: type=gha
           push: true
