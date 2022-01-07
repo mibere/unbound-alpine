@@ -17,9 +17,25 @@ docker build -t unbound-alpine --pull --no-cache .
 docker rmi $(docker images -qa -f "dangling=true")
 ```
 
+### Preparations on the host
+```
+sudo nano /etc/sysctl.d/99-sysctl.conf
+```
+
+> net.ipv6.conf.all.disable_ipv6 = 1  
+> net.ipv4.ip_forward = 1  
+> net.core.rmem_default = 2097152  
+> net.core.rmem_max = 2097152  
+> net.core.wmem_default = 2097152  
+> net.core.wmem_max = 2097152
+
+```
+sudo sysctl -p
+```
+
 ### Start container
 ```
-docker run --name=unbound --restart=always --network=host --security-opt seccomp=unconfined -d ghcr.io/mibere/unbound-alpine
+docker run --name=unbound --restart=always --network=host -d ghcr.io/mibere/unbound-alpine
 ```
 
 ### Update container
@@ -27,5 +43,5 @@ docker run --name=unbound --restart=always --network=host --security-opt seccomp
 docker stop unbound
 docker rm unbound
 docker pull ghcr.io/mibere/unbound-alpine
-docker run --name=unbound --restart=always --network=host --security-opt seccomp=unconfined -d ghcr.io/mibere/unbound-alpine
+docker run --name=unbound --restart=always --network=host -d ghcr.io/mibere/unbound-alpine
 ```
