@@ -18,7 +18,7 @@ on:
       - "Dockerfile"
       - "etc/unbound/unbound.conf"
   schedule:
-    - cron: "19 7 * * 2"
+    - cron: "19 7 * * 3"
 
 jobs:
   lint:
