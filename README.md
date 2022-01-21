@@ -33,12 +33,12 @@ sudo nano /etc/sysctl.d/99-sysctl.conf
 sudo sysctl -p
 ```
 
-### Start container
+### Start container for the first time
 ```
 docker run --name=unbound --restart=always --network=host -d ghcr.io/mibere/unbound-alpine
 ```
 
-### Update container
+### Update existing container
 ```
 docker stop unbound
 docker rm unbound
