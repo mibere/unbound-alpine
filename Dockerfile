@@ -13,4 +13,4 @@ COPY /etc/unbound/unbound.conf /etc/unbound/
 COPY --from=hints /tmp/root.hints /var/lib/unbound/
 RUN /usr/sbin/unbound-anchor -4 -r /var/lib/unbound/root.hints -a /var/lib/unbound/root.key ; true && \
 	chown -R unbound:unbound /var/lib/unbound/
-CMD ["/usr/sbin/unbound", "-c", "/etc/unbound/unbound.conf", "-d"]
+CMD ["/bin/nice", "-n", "-11", "/usr/sbin/unbound", "-c", "/etc/unbound/unbound.conf", "-d"]
