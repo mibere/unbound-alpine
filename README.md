@@ -35,7 +35,7 @@ sudo sysctl -p
 
 ### Start container for the first time
 ```
-docker run --name=unbound --restart=always --network=host -d ghcr.io/mibere/unbound-alpine
+docker run --name=unbound --restart=always --cap-add=SYS_NICE --network=host -d ghcr.io/mibere/unbound-alpine
 ```
 
 ### Update existing container
@@ -43,5 +43,5 @@ docker run --name=unbound --restart=always --network=host -d ghcr.io/mibere/unbo
 docker stop unbound
 docker rm unbound
 docker pull ghcr.io/mibere/unbound-alpine
-docker run --name=unbound --restart=always --network=host -d ghcr.io/mibere/unbound-alpine
+docker run --name=unbound --restart=always --cap-add=SYS_NICE --network=host -d ghcr.io/mibere/unbound-alpine
 ```
