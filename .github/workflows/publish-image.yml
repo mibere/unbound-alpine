@@ -67,7 +67,7 @@ jobs:
       - name: Test image
         # https://workbench.sidnlabs.nl/bad-dnssec.html
         run: |
-          docker run --name=test --rm --network=host --platform=linux/arm/v7 -d testimage
+          docker run --name=test --rm --cap-add=SYS_NICE --network=host --platform=linux/arm/v7 -d testimage
           sleep 10s
           docker logs test
           docker exec test ls /var/lib/unbound/root.hints
