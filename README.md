@@ -45,3 +45,5 @@ docker rm unbound
 docker pull ghcr.io/mibere/unbound-alpine
 docker run --name=unbound --restart=always --cap-add=SYS_NICE --network=host -d ghcr.io/mibere/unbound-alpine
 ```
+<br/>
+:point_right: Unbound is listening on port 8253
