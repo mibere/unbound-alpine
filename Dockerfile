@@ -6,7 +6,7 @@ RUN apk upgrade --no-cache && \
 
 FROM alpine:edge
 RUN apk upgrade --no-cache && \
-	apk add --no-cache ca-certificates unbound drill nc && \
+	apk add --no-cache ca-certificates unbound drill netcat-openbsd && \
 	mkdir -p /var/lib/unbound/ && \
 	rm -rf /etc/unbound/*.conf /etc/unbound/conf.d/*.conf /etc/unbound/root.* /var/lib/unbound/root.* /var/cache/apk/* /tmp/* /var/tmp/* /var/log/*
 COPY /etc/unbound/unbound.conf /etc/unbound/
